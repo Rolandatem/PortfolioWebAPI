@@ -25,12 +25,12 @@ public class TrendingProductsController(
         [FromQuery] bool withDelay = false,
         [FromQuery] bool withError = false)
     {
+        if (withDelay) { await Task.Delay(2000); }
+
         if (withError)
         {
             throw new Exception("Test Exception");
         }
-
-        if (withDelay) { await Task.Delay(2000); }
         
         return await _context.TrendingProducts.ToListAsync();
     }
