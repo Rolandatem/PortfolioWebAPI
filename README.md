@@ -11,3 +11,14 @@ Before running any of my various demos that requires this Web API please
 make sure that in instance of this is running. If using CLI the simple run
 command will suffice.  
 `dotnet run`
+
+The use can test Production environment settings by using the 'httpProd' launch profile.  
+`dotnet run --launch-profile httpProd`
+
+## Endpoints
+
+### TendingProducts
+Endpoint used for trending products of the e-commerce site.
+
+`GET [/api/trendingproducts]`  
+Retrieves a list of trending products. In this demo a hard-coded list is returned to simulate this.
