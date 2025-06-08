@@ -1,7 +1,9 @@
 using PortfolioWebAPI.Data;
 using PortfolioWebAPI.Data.Seeders;
 using PortfolioWebAPI.Interfaces;
+using PortfolioWebAPI.Middleware;
 using PortfolioWebAPI.Services;
+using PortfolioWebAPI.Settings;
 
 //--Create App Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,14 @@ builder.Services
     .AddTransient<SeedingService>()
     .AddTransient<IDataSeeder, TrendingProductDataSeeder>();
 
+//--Configuration
+builder.Configuration.AddJsonFile("settings/appsettings.json");
+builder.Configuration.AddJsonFile($"settings/appsettings.{builder.Environment.EnvironmentName}.json");
+
+//--Configure IOptions
+builder.Services.Configure<SiteSettingOptions>(
+    builder.Configuration.GetSection(SiteSettingOptions.SiteSettings));
+
 //--Build Application
 var app = builder.Build();
 
@@ -30,8 +40,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 //app.UseHttpsRedirection();
+app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors(cors => cors
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowAnyOrigin());
 
 //--Seed data for in-memory database.
 using (IServiceScope scope = app.Services.CreateScope())

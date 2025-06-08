@@ -30,7 +30,7 @@ internal class TrendingProductDataSeeder(
                 Id = 2,
                 ProductName = "VersaStep Pro Marley Dance Floor Rolls",
                 SKU = "D-1000",
-                ImageUrl = "trending/versa-step-pro-markley-dance-floor-rolls.webp",
+                ImageUrl = "trending/versa-step-pro-marley-dance-floor-rolls.webp",
                 Stars = 4,
                 Reviews = 26,
                 ColorCount = 2,
