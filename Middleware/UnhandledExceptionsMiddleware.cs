@@ -30,7 +30,6 @@ internal class UnhandledExceptionMiddleware(
 
         var response = new
         {
-            message = "An unhandled exception occured",
             exceptionMessage = _siteSettings.Value.ShowDetailedUnhandledExceptions
                 ? ex.Message
                 : String.Empty,
