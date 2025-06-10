@@ -4,9 +4,14 @@ using PortfolioWebAPI.Settings;
 
 namespace PortfolioWebAPI.Middleware;
 
+/// <summary>
+/// Middleware used to set up an error response for
+/// unhandled exceptions.
+/// </summary>
+/// <param name="_next">Next item in pipeline.</param>
+/// <param name="_siteSettings">Global site settings.</param>
 internal class UnhandledExceptionMiddleware(
     RequestDelegate _next,
-    ILogger<UnhandledExceptionMiddleware> _logger,
     IOptions<SiteSettingOptions> _siteSettings)
 {
     public async Task InvokeAsync(HttpContext httpContext)
@@ -17,7 +22,6 @@ internal class UnhandledExceptionMiddleware(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled Exception");
             await HandleExceptionAsync(httpContext, ex);
         }
     }

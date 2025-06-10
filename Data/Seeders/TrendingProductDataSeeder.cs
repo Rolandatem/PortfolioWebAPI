@@ -9,7 +9,7 @@ internal class TrendingProductDataSeeder(
 {
     public async Task SeedAsync()
     {
-        await _context.AddRangeAsync([
+        await _context.TrendingProducts.AddRangeAsync([
             new TrendingProduct()
             {
                 Id = 1,

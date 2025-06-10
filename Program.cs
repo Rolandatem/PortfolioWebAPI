@@ -4,6 +4,7 @@ using PortfolioWebAPI.Interfaces;
 using PortfolioWebAPI.Middleware;
 using PortfolioWebAPI.Services;
 using PortfolioWebAPI.Settings;
+using PortfolioWebAPI.Tools;
 
 //--Create App Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,8 @@ builder.Services
 builder.Services.AddDbContext<PortfolioDbContext>();
 builder.Services
     .AddTransient<SeedingService>()
-    .AddTransient<IDataSeeder, TrendingProductDataSeeder>();
+    .AddTransient<IDataSeeder, TrendingProductDataSeeder>()
+    .AddTransient<IDataSeeder, CategoryDataSeeder>();
 
 //--Configuration
 builder.Configuration.AddJsonFile("settings/appsettings.json");
@@ -26,6 +28,12 @@ builder.Configuration.AddJsonFile($"settings/appsettings.{builder.Environment.En
 //--Configure IOptions
 builder.Services.Configure<SiteSettingOptions>(
     builder.Configuration.GetSection(SiteSettingOptions.SiteSettings));
+
+//--Add controller options.
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CommonTestingActionFilter>();
+});
 
 //--Build Application
 var app = builder.Build();

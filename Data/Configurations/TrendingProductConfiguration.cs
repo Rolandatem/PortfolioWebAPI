@@ -4,12 +4,13 @@ using PortfolioWebAPI.Data.Models;
 
 namespace PortfolioWebAPI.Data.Configurations;
 
-public class TrendingProductConfiguration : IEntityTypeConfiguration<TrendingProduct>
+internal class TrendingProductConfiguration : IEntityTypeConfiguration<TrendingProduct>
 {
     public void Configure(EntityTypeBuilder<TrendingProduct> builder)
     {
         builder.HasKey(k => k.Id);
-        builder.HasIndex(i => i.SKU).IsUnique();
+        builder.HasIndex(i => i.SKU)
+            .IsUnique();
 
         builder.Property(p => p.ProductName)
             .HasMaxLength(100)

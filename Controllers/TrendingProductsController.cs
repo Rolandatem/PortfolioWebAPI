@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PortfolioWebAPI.Data;
@@ -9,7 +8,7 @@ namespace PortfolioWebAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class TrendingProductsController(
-    PortfolioDbContext _context) : ControllerBase
+    PortfolioDbContext _context) : PortfolioBaseController
 {
 
     /// <summary>
@@ -17,19 +16,16 @@ public class TrendingProductsController(
     /// This simulates the act of retrieving trending products from the database,
     /// however here we are simulating this by just retrieving a pre-created list.
     /// </summary>
-    /// <param name="withDelay">Adds a 2 second delay for testing latency.</param>
-    /// <param name="withError">Causes an exception to test errors.</param>
     /// <returns>List of Trending Products</returns>
+    /// <exception cref="Exception">Test exception if requested.</exception>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TrendingProduct>>> GetTrendingProductsAsync(
-        [FromQuery] bool withDelay = false,
-        [FromQuery] bool withError = false)
+    public async Task<ActionResult<IEnumerable<TrendingProduct>>> GetTrendingProductsAsync()
     {
-        if (withDelay) { await Task.Delay(2000); }
+        if (base.WithDelay) { await Task.Delay(2000); }
 
-        if (withError)
+        if (base.WithError)
         {
-            throw new Exception("Test Exception");
+            throw new Exception("Test Exception from [HttpGet]GetTrendingProducts");
         }
         
         return await _context.TrendingProducts.ToListAsync();
