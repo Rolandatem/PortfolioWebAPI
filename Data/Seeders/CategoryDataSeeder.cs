@@ -12,7 +12,7 @@ internal class CategoryDataSeeder(
             new Category() {
                 Id = 1,
                 Name = "Rubber Flooring",
-                ImageUrl = "categories/rubber-flooring.webp"
+                ImageUrl = "categories/rubber_flooring.webp"
             },
             new Category() {
                 Id = 2,
@@ -62,7 +62,7 @@ internal class CategoryDataSeeder(
             new Category() {
                 Id = 11,
                 Name = "Turf & Artificial Grass",
-                ImageUrl = "categories/turf_and_artificial_grass"
+                ImageUrl = "categories/turf_and_artificial_grass.webp"
             },
             new Category() {
                 Id = 12,
