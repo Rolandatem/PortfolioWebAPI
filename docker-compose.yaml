@@ -1,0 +1,20 @@
+name: portfolio-web-api-container
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: portfolio-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SomePassword#1
+    ports:
+      - "1433:1433"
+
+  webapi:
+    container_name: portfolio-web-api
+    image: estebanfmartinez/myimages:portfolio-webapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerCompose
+    depends_on:
+      - mssql
+    ports:
+      - "5000:5000"

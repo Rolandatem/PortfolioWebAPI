@@ -1,3 +1,4 @@
+using PortfolioWebAPI;
 using PortfolioWebAPI.Data;
 using PortfolioWebAPI.Data.Seeders;
 using PortfolioWebAPI.Interfaces;
@@ -15,15 +16,15 @@ builder.Services
     .AddOpenApi();
 
 //--Custom Services
-builder.Services.AddDbContext<PortfolioDbContext>();
+builder.Services.AddDbContext<PortfolioDbContext>(ServiceLifetime.Transient);
 builder.Services
     .AddTransient<SeedingService>()
     .AddTransient<IDataSeeder, TrendingProductDataSeeder>()
     .AddTransient<IDataSeeder, CategoryDataSeeder>();
 
 //--Configuration
-builder.Configuration.AddJsonFile("settings/appsettings.json");
-builder.Configuration.AddJsonFile($"settings/appsettings.{builder.Environment.EnvironmentName}.json");
+builder.Configuration.AddJsonFile("Settings/appsettings.json");
+builder.Configuration.AddJsonFile($"Settings/appsettings.{builder.Environment.EnvironmentName}.json");
 
 //--Configure IOptions
 builder.Services.Configure<SiteSettingOptions>(
@@ -39,7 +40,7 @@ builder.Services.AddControllers(options =>
 var app = builder.Build();
 
 //--Configure Application
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsDockerSolo() || app.Environment.IsDockerCompose())
 {
     app.MapOpenApi();
     app.UseSwaggerUi(options =>
@@ -59,6 +60,11 @@ app.UseCors(cors => cors
 //--Seed data for in-memory database.
 using (IServiceScope scope = app.Services.CreateScope())
 {
+    //--Refresh DB
+    PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
+    await context.Database.EnsureDeletedAsync();
+    await context.Database.EnsureCreatedAsync();
+    
     SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
     await seedingService.SeedDatabaseAsync();
 }

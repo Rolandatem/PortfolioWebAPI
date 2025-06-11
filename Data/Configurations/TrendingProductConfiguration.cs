@@ -23,8 +23,12 @@ internal class TrendingProductConfiguration : IEntityTypeConfiguration<TrendingP
         builder.Property(p => p.Reviews).IsRequired();
         builder.Property(p => p.ColorCount).IsRequired();
         builder.Property(p => p.Description).IsRequired();
-        builder.Property(p => p.SalePrice).IsRequired();
-        builder.Property(p => p.OriginalPrice).IsRequired();
+        builder.Property(p => p.SalePrice)
+            .HasPrecision(18, 2)
+            .IsRequired();
+        builder.Property(p => p.OriginalPrice)
+            .HasPrecision(18, 2)
+            .IsRequired();
         builder.Property(p => p.SavingsPercentage).IsRequired();
         builder.Property(p => p.ShipType).IsRequired();
     }

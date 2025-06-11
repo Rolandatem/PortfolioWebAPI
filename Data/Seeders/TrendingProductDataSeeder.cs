@@ -12,9 +12,8 @@ internal class TrendingProductDataSeeder(
         await _context.TrendingProducts.AddRangeAsync([
             new TrendingProduct()
             {
-                Id = 1,
                 ProductName = "Next-Day Rubber Rolls",
-                SKU = "R-1000",
+                SKU = "ROLL-1000",
                 ImageUrl = "trending/next-day-rubber-rolls.webp",
                 Stars = 5,
                 Reviews = 4,
@@ -27,9 +26,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 2,
                 ProductName = "VersaStep Pro Marley Dance Floor Rolls",
-                SKU = "D-1000",
+                SKU = "DANCE-1000",
                 ImageUrl = "trending/versa-step-pro-marley-dance-floor-rolls.webp",
                 Stars = 4,
                 Reviews = 26,
@@ -42,9 +40,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 3,
                 ProductName = "3/8\" Heavy Duty Rubber Rolls",
-                SKU = "R-1001",
+                SKU = "ROLL-1001",
                 ImageUrl = "trending/3-8-heavy-duty-rubber-rolls.webp",
                 Stars = 4,
                 Reviews = 351,
@@ -57,9 +54,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 4,
                 ProductName = "Ribbed Carpet Tiles - Quick Ship",
-                SKU = "C-1000",
+                SKU = "CARPET-1000",
                 ImageUrl = "trending/rubbed-carpet-tiles-quick-ship.webp",
                 Stars = 4,
                 Reviews = 245,
@@ -72,9 +68,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 5,
                 ProductName = "TritonCORE Pro 7\" Rigid Core Vinyl Planks",
-                SKU = "V-1000",
+                SKU = "VINYL-1000",
                 ImageUrl = "trending/tritoncore-pro-7-rigid-core-vinyl-planks.webp",
                 Stars = 4,
                 Reviews = 34,
@@ -87,9 +82,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 6,
                 ProductName = "Nitro Garage Floor Tiles",
-                SKU = "G-1000",
+                SKU = "GARAGE-1000",
                 ImageUrl = "trending/nitro-garage-floor-tiles.webp",
                 Stars = 4,
                 Reviews = 395,
@@ -102,9 +96,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 7,
                 ProductName = "Jamboree Rubber Playground Tiles",
-                SKU = "R-1002",
+                SKU = "TILE-1000",
                 ImageUrl = "trending/jamboree-rubber-playground-tiles.webp",
                 Stars = 4,
                 Reviews = 21,
@@ -117,9 +110,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 8,
                 ProductName = "Helios Composite Deck Tiles",
-                SKU = "D-1000",
+                SKU = "DECK-1000",
                 ImageUrl = "trending/helios-composite-deck-tiles.webp",
                 Stars = 5,
                 Reviews = 30,
@@ -132,9 +124,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 9,
                 ProductName = "Indoor Basketball Court Tiles",
-                SKU = "T-1000",
+                SKU = "TILE-1001",
                 ImageUrl = "trending/indoor-basketball-court-tiles.webp",
                 Stars = 4,
                 Reviews = 9,
@@ -147,9 +138,8 @@ internal class TrendingProductDataSeeder(
             },
             new TrendingProduct()
             {
-                Id = 10,
                 ProductName = "Performance Gym Turf Rolls",
-                SKU = "R-1003",
+                SKU = "ROLL-1003",
                 ImageUrl = "trending/performance-gym-turf-rolls.webp",
                 Stars = 4,
                 Reviews = 19,

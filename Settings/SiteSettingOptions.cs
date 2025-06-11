@@ -1,7 +1,8 @@
 namespace PortfolioWebAPI.Settings;
 
-internal class SiteSettingOptions
+public class SiteSettingOptions
 {
     public static string SiteSettings = "SiteSettings";
     public bool ShowDetailedUnhandledExceptions { get; set; }
+    public string PortfolioDbServer { get; set; } = String.Empty;
 }

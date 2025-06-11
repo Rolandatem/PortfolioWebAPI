@@ -1,6 +1,8 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PortfolioWebAPI.Data.Models;
+using PortfolioWebAPI.Settings;
 
 namespace PortfolioWebAPI.Data;
 
@@ -9,11 +11,20 @@ namespace PortfolioWebAPI.Data;
 /// </summary>
 public class PortfolioDbContext : DbContext
 {
+    #region "Member Variables"
+    ILogger<PortfolioDbContext>? _logger = null;
+    readonly SiteSettingOptions? _siteSettings = null;
+    #endregion
+
     #region "Constructor"
-    public PortfolioDbContext(DbContextOptions<PortfolioDbContext> options)
+    public PortfolioDbContext(
+        DbContextOptions<PortfolioDbContext> options,
+        ILogger<PortfolioDbContext> logger,
+        IOptions<SiteSettingOptions> settings)
         : base(options)
     {
-
+        _siteSettings = settings.Value;
+        _logger = logger;
     }
     #endregion
 
@@ -27,8 +38,13 @@ public class PortfolioDbContext : DbContext
     {
         base.OnConfiguring(optionsBuilder);
 
+        _logger?.LogInformation("DB SERVER: {server}", _siteSettings?.PortfolioDbServer);
+
+        // optionsBuilder
+        //     .UseInMemoryDatabase("Portfolio");
         optionsBuilder
-            .UseInMemoryDatabase("Portfolio");
+            .UseSqlServer($"Server={_siteSettings?.PortfolioDbServer},1433;Database=PortfolioDB;User Id=sa;Password=SomePassword#1;TrustServerCertificate=True");
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,16 +52,6 @@ public class PortfolioDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         Assembly assembly = GetType().Assembly;
         modelBuilder.ApplyConfigurationsFromAssembly(assembly);
-    }
-    #endregion
-
-    #region "Seeding"
-    public async Task SeedDataAsync()
-    {
-        if (Database.EnsureCreated())
-        {
-            await SaveChangesAsync();
-        }
     }
     #endregion
 }
