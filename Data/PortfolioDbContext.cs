@@ -29,8 +29,9 @@ public class PortfolioDbContext : DbContext
     #endregion
 
     #region "Tables"
-    public DbSet<TrendingProduct> TrendingProducts { get; set; } = null!;
-    public DbSet<Category> Categories { get; set; } = null!;
+    internal DbSet<TrendingProduct> TrendingProducts { get; set; } = null!;
+    internal DbSet<Category> Categories { get; set; } = null!;
+    internal DbSet<FAQ> FAQs { get; set; } = null!;
     #endregion
 
     #region "Configuring"

@@ -20,7 +20,8 @@ builder.Services.AddDbContext<PortfolioDbContext>(ServiceLifetime.Transient);
 builder.Services
     .AddTransient<SeedingService>()
     .AddTransient<IDataSeeder, TrendingProductDataSeeder>()
-    .AddTransient<IDataSeeder, CategoryDataSeeder>();
+    .AddTransient<IDataSeeder, CategoryDataSeeder>()
+    .AddTransient<IDataSeeder, FAQsDataSeeder>();
 
 //--Configuration
 builder.Configuration.AddJsonFile("Settings/appsettings.json");
@@ -60,13 +61,22 @@ app.UseCors(cors => cors
 //--Seed data for in-memory database.
 using (IServiceScope scope = app.Services.CreateScope())
 {
+    ILogger<Program>? logger = scope.ServiceProvider.GetService<ILogger<Program>>();
+
     //--Refresh DB
-    PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
-    await context.Database.EnsureDeletedAsync();
-    await context.Database.EnsureCreatedAsync();
-    
-    SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
-    await seedingService.SeedDatabaseAsync();
+    try
+    {
+        PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
+        await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureCreatedAsync();
+
+        SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+        await seedingService.SeedDatabaseAsync();
+    }
+    catch (Exception ex)
+    {
+        logger?.LogWarning("SEED ERROR, Ignoring. Message: {exMessage}", ex.Message);
+    }
 }
 
 //--App Start!

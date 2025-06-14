@@ -21,12 +21,7 @@ public class TrendingProductsController(
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TrendingProduct>>> GetTrendingProductsAsync()
     {
-        if (base.WithDelay) { await Task.Delay(2000); }
-
-        if (base.WithError)
-        {
-            throw new Exception("Test Exception from [HttpGet]GetTrendingProducts");
-        }
+        await base.DoTestsAsync();
         
         return await _context.TrendingProducts.ToListAsync();
     }
