@@ -32,6 +32,11 @@ public class PortfolioDbContext : DbContext
     internal DbSet<TrendingProduct> TrendingProducts { get; set; } = null!;
     internal DbSet<Category> Categories { get; set; } = null!;
     internal DbSet<FAQ> FAQs { get; set; } = null!;
+    internal DbSet<Product> Products { get; set; } = null!;
+    internal DbSet<TagType> TagTypes { get; set; } = null!;
+    internal DbSet<Tag> Tags { get; set; } = null!;
+    internal DbSet<SiteFilterTagType> SiteFilterTagTypes { get; set; } = null!;
+    internal DbSet<ProductTag> ProductTags { get; set; } = null!;
     #endregion
 
     #region "Configuring"

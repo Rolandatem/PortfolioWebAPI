@@ -1,9 +1,6 @@
 using PortfolioWebAPI;
 using PortfolioWebAPI.Data;
-using PortfolioWebAPI.Data.Seeders;
-using PortfolioWebAPI.Interfaces;
 using PortfolioWebAPI.Middleware;
-using PortfolioWebAPI.Services;
 using PortfolioWebAPI.Settings;
 using PortfolioWebAPI.Tools;
 
@@ -17,11 +14,6 @@ builder.Services
 
 //--Custom Services
 builder.Services.AddDbContext<PortfolioDbContext>(ServiceLifetime.Transient);
-builder.Services
-    .AddTransient<SeedingService>()
-    .AddTransient<IDataSeeder, TrendingProductDataSeeder>()
-    .AddTransient<IDataSeeder, CategoryDataSeeder>()
-    .AddTransient<IDataSeeder, FAQsDataSeeder>();
 
 //--Configuration
 builder.Configuration.AddJsonFile("Settings/appsettings.json");
@@ -57,28 +49,6 @@ app.UseCors(cors => cors
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowAnyOrigin());
-
-
-//--Seed data for in-memory database.
-// using (IServiceScope scope = app.Services.CreateScope())
-// {
-//     ILogger<Program>? logger = scope.ServiceProvider.GetService<ILogger<Program>>();
-
-//     //--Refresh DB
-//     try
-//     {
-//         PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
-//         await context.Database.EnsureDeletedAsync();
-//         await context.Database.EnsureCreatedAsync();
-
-//         SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
-//         await seedingService.SeedDatabaseAsync();
-//     }
-//     catch (Exception ex)
-//     {
-//         logger?.LogWarning("SEED ERROR, Ignoring. Message: {exMessage}", ex.Message);
-//     }
-// }
 
 //--App Start!
 app.Run();
