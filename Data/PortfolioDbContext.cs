@@ -43,8 +43,10 @@ public class PortfolioDbContext : DbContext
 
         // optionsBuilder
         //     .UseInMemoryDatabase("Portfolio");
+        // optionsBuilder
+        //     .UseSqlServer($"Server={_siteSettings?.PortfolioDbServer},1433;Database=PortfolioDB;User Id=sa;Password=SomePassword#1;TrustServerCertificate=True");
         optionsBuilder
-            .UseSqlServer($"Server={_siteSettings?.PortfolioDbServer},1433;Database=PortfolioDB;User Id=sa;Password=SomePassword#1;TrustServerCertificate=True");
+            .UseNpgsql($"Host={_siteSettings?.PortfolioDbServer};Port=5432;Database=portfoliodb;Username=sa;Password=SomePassword#1");
 
     }
 

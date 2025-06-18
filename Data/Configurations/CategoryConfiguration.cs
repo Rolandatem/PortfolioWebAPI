@@ -8,6 +8,8 @@ internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
+        builder.ToTable("Category");
+
         builder.HasKey(k => k.Id);
         builder.HasIndex(i => i.Name)
             .IsUnique();

@@ -58,26 +58,27 @@ app.UseCors(cors => cors
     .AllowAnyMethod()
     .AllowAnyOrigin());
 
+
 //--Seed data for in-memory database.
-using (IServiceScope scope = app.Services.CreateScope())
-{
-    ILogger<Program>? logger = scope.ServiceProvider.GetService<ILogger<Program>>();
+// using (IServiceScope scope = app.Services.CreateScope())
+// {
+//     ILogger<Program>? logger = scope.ServiceProvider.GetService<ILogger<Program>>();
 
-    //--Refresh DB
-    try
-    {
-        PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+//     //--Refresh DB
+//     try
+//     {
+//         PortfolioDbContext context = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
+//         await context.Database.EnsureDeletedAsync();
+//         await context.Database.EnsureCreatedAsync();
 
-        SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
-        await seedingService.SeedDatabaseAsync();
-    }
-    catch (Exception ex)
-    {
-        logger?.LogWarning("SEED ERROR, Ignoring. Message: {exMessage}", ex.Message);
-    }
-}
+//         SeedingService seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+//         await seedingService.SeedDatabaseAsync();
+//     }
+//     catch (Exception ex)
+//     {
+//         logger?.LogWarning("SEED ERROR, Ignoring. Message: {exMessage}", ex.Message);
+//     }
+// }
 
 //--App Start!
 app.Run();

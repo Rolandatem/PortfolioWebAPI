@@ -8,6 +8,8 @@ internal class FAQConfiguration : IEntityTypeConfiguration<FAQ>
 {
     public void Configure(EntityTypeBuilder<FAQ> builder)
     {
+        builder.ToTable("FAQ");
+        
         builder.HasKey(k => k.Id);
 
         builder.Property(p => p.Question)

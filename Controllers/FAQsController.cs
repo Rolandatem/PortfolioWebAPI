@@ -10,6 +10,7 @@ namespace PortfolioWebAPI.Controllers;
 public class FAQsController(
     PortfolioDbContext _context) : PortfolioBaseController
 {
+    #region "GET"
     /// <summary>
     /// Gets all FAQ's that are site applicable.
     /// </summary>
@@ -60,6 +61,54 @@ public class FAQsController(
     }
 
     /// <summary>
+    /// Searches for any relavent matching FAQ's based on the user's query.
+    /// </summary>
+    /// <param name="query">User question.</param>
+    /// <returns>List of matching FAQ's.</returns>
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<FAQSearchResult>>> SearchFAQsAsync([FromQuery] string query)
+    {
+        await base.DoTestsAsync();
+
+        if (query.Length > 255)
+        {
+            //--Prevent resource exhuastion.
+            return BadRequest("Query is too long, Max 255 characters.");
+        }
+
+        //--MSSQL
+        // return await _context.FAQs
+        //     .FromSqlRaw("EXEC SearchFAQs @p0", query)
+        //     .ToListAsync();
+
+        //--POSTGRESQL
+        return await _context.Set<FAQSearchResult>()
+            .FromSqlInterpolated($"SELECT * FROM search_FAQs({query})")
+            .ToListAsync();
+    }
+    #endregion
+
+    /// <summary>
+    /// Submits a new question to the FAQ's.
+    /// </summary>
+    /// <param name="userSubmittedQuestion">FAQ Question submission.</param>
+    /// <returns>Created FAQ object.</returns>
+    #region "POST"
+    [HttpPost]
+    public async Task<ActionResult<FAQ>> PostNewQuestionAsync([FromBody] FAQ userSubmittedQuestion)
+    {
+        //--Ensure that the site ready flag is off.
+        userSubmittedQuestion.IsSiteReady = false;
+
+        _context.FAQs.Add(userSubmittedQuestion);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction("GetFAQ", new { id = userSubmittedQuestion.Id }, userSubmittedQuestion);
+    }
+    #endregion
+
+    #region "PATCH"
+    /// <summary>
     /// Patches a FAQ by updating the upvotes or downvotes as specified.
     /// </summary>
     /// <param name="id">DB ID of the FAQ</param>
@@ -86,4 +135,5 @@ public class FAQsController(
 
         return NoContent();
     }
+    #endregion
 }
