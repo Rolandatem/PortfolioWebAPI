@@ -1,15 +1,16 @@
-using System.Text.Json;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PortfolioWebAPI.Data;
-using PortfolioWebAPI.Data.Models;
+using PortfolioWebAPI.Data.DTOs;
 
 namespace PortfolioWebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class TrendingProductsController(
-    ILogger<TrendingProductsController> _logger,
+    IMapper _mapper,
     PortfolioDbContext _context) : PortfolioBaseController
 {
 
@@ -21,31 +22,13 @@ public class TrendingProductsController(
     /// <returns>List of Trending Products</returns>
     /// <exception cref="Exception">Test exception if requested.</exception>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> GetTrendingProductsAsync()
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetTrendingProductsAsync()
     {
         await base.DoTestsAsync();
 
-        var data = await _context.TrendingProducts
-            .Select(tp => new
-            {
-                tp.Product.Id,
-                tp.Product.ProductName,
-                tp.Product.SKU,
-                tp.Product.ImageUrl,
-                tp.Product.Stars,
-                tp.Product.Reviews,
-                tp.Product.ColorCount,
-                tp.Product.Description,
-                tp.Product.SalePrice,
-                tp.Product.OriginalPrice,
-                tp.Product.SavingsPercentage,
-                ShipType = tp.Product.ProductTags
-                    .Where(pt => pt.Tag.TagType.Name == "ShipType")
-                    .Select(pt => pt.Tag.Id)
-                    .FirstOrDefault()
-            })
-            .ToListAsync();
-
-        return Ok(data);
+        return Ok(await _context.TrendingProducts
+            .Select(tp => tp.Product)
+            .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
+            .ToListAsync());
     }
 }

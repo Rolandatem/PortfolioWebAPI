@@ -9,6 +9,7 @@ internal class TrendingProductConfiguration : IEntityTypeConfiguration<TrendingP
     public void Configure(EntityTypeBuilder<TrendingProduct> builder)
     {
         builder.ToTable("TrendingProduct");
+        builder.HasIndex(i => i.ProductId).IsUnique();
 
         builder.HasKey(k => k.Id);
 

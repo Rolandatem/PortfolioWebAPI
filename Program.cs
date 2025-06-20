@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 //--System Services
 builder.Services.AddControllers();
 builder.Services
-    .AddOpenApi();
+    .AddOpenApi()
+    .AddAutoMapper(typeof(AutoMapperProfile));
 
 //--Custom Services
 builder.Services.AddDbContext<PortfolioDbContext>(ServiceLifetime.Transient);

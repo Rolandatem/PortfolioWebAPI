@@ -14,6 +14,9 @@ public class SiteFilterTagTypeConfiguration : IEntityTypeConfiguration<SiteFilte
         builder.HasIndex(i => i.TagTypeId).IsUnique();
 
         builder.Property(p => p.TagTypeId).IsRequired();
+        builder.Property(p => p.FilterType)
+            .HasMaxLength(8)
+            .IsRequired();
 
         builder
             .HasOne(siteFilterTagType => siteFilterTagType.TagType)
