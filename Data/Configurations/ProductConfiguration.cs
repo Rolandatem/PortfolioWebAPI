@@ -36,7 +36,12 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder
             .HasMany(product => product.ProductTags)
             .WithOne(productTag => productTag.Product)
-            .HasForeignKey(product => product.ProductId);
+            .HasForeignKey(productTag => productTag.ProductId);
+
+        builder
+            .HasMany(product => product.ProductHighlights)
+            .WithOne()
+            .HasForeignKey(productHighlight => productHighlight.ProductId);
 
         builder
             .HasOne(product => product.Category)

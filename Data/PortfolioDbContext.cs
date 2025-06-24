@@ -37,6 +37,10 @@ public class PortfolioDbContext : DbContext
     internal DbSet<Tag> Tags { get; set; } = null!;
     internal DbSet<SiteFilterTagType> SiteFilterTagTypes { get; set; } = null!;
     internal DbSet<ProductTag> ProductTags { get; set; } = null!;
+    internal DbSet<ImageType> ImageTypes { get; set; } = null!;
+    internal DbSet<ProductImage> ProductImages { get; set; } = null!;
+    internal DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
+    internal DbSet<ShoppingCartLineItem> ShoppingCartLineItems { get; set; } = null!;
     #endregion
 
     #region "Configuring"
@@ -51,7 +55,12 @@ public class PortfolioDbContext : DbContext
         // optionsBuilder
         //     .UseSqlServer($"Server={_siteSettings?.PortfolioDbServer},1433;Database=PortfolioDB;User Id=sa;Password=SomePassword#1;TrustServerCertificate=True");
         optionsBuilder
-            .UseNpgsql($"Host={_siteSettings?.PortfolioDbServer};Port=5432;Database=portfoliodb;Username=sa;Password=SomePassword#1");
+            .UseNpgsql($"Host={_siteSettings?.PortfolioDbServer};Port=5432;Database=portfoliodb;Username=sa;Password=SomePassword#1", options =>
+            {
+                //--This helps in performance when an object with multiple
+                //--navigation properties are requested.
+                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
 
     }
 

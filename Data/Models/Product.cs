@@ -14,8 +14,10 @@ public class Product
     public decimal OriginalPrice { get; set; }
     public int SavingsPercentage { get; set; }
 
-    public ICollection<ProductTag> ProductTags { get; set; } = new HashSet<ProductTag>();
-
     public int CategoryId { get; set; }
-    public required Category Category { get; set; }
+    public Category? Category { get; set; }
+
+    public ICollection<ProductTag> ProductTags { get; set; } = new HashSet<ProductTag>();
+    public ICollection<ProductHighlight> ProductHighlights { get; set; } = new HashSet<ProductHighlight>();
+    public ICollection<ProductImage> ProductImages { get; set; } = new HashSet<ProductImage>();
 }

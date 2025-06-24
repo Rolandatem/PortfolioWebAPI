@@ -6,5 +6,5 @@ public class SiteFilterTagType
     public required string FilterType { get; set; }
 
     public int TagTypeId { get; set; }
-    public required TagType TagType { get; set; }
+    public TagType? TagType { get; set; }
 }

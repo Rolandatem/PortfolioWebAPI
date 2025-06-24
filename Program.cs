@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using PortfolioWebAPI;
 using PortfolioWebAPI.Data;
 using PortfolioWebAPI.Middleware;
@@ -46,10 +47,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsDockerSolo() || app.Env
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
+
+IOptions<SiteSettingOptions> siteSettings = app.Services.GetRequiredService<IOptions<SiteSettingOptions>>();
+
 app.UseCors(cors => cors
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .AllowAnyOrigin());
+    .WithOrigins(siteSettings.Value.AllowedOrigins)
+    .AllowCredentials());
 
 //--App Start!
 app.Run();

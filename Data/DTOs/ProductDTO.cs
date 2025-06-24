@@ -13,5 +13,7 @@ public record ProductDTO(
     decimal OriginalPrice,
     int SavingsPercentage,
     int CategoryId,
-    ICollection<ProductTagDTO> ProductTags
+    ICollection<ProductTagDTO> ProductTags,
+    ICollection<ProductHighlightDTO> ProductHighlights,
+    ICollection<ProductImageDTO> ProductImages
 );
