@@ -11,7 +11,6 @@ namespace PortfolioWebAPI.Controllers;
 [Route("/api/[controller]")]
 [ApiController]
 public class ShoppingCartController(
-    ILogger<ShoppingCartController> _logger,
     IMapper _mapper,
     PortfolioDbContext _context) : PortfolioBaseController
 {
@@ -74,6 +73,7 @@ public class ShoppingCartController(
         //--Add line item to cart.
         cart.LineItems.Add(new ShoppingCartLineItem()
         {
+            ProductId = lineItem.ProductId,
             Quantity = lineItem.Quantity,
             SalePriceAtSale = lineItem.SalePriceAtSale,
             OriginalPriceAtSale = lineItem.OriginalPriceAtSale,
@@ -97,11 +97,9 @@ public class ShoppingCartController(
 
         //--Get cart
         string? cartKey = Request.Cookies["cart_key"];
-        _logger.LogInformation("Cart Key from cookie: {cartKey}", cartKey);
 
         if (cartKey.IsEmpty())
         {
-            _logger.LogError("Cart Key was empty, so sent bad request");
             return BadRequest("Customer doesn't have a cart.");
         }
 
@@ -112,19 +110,17 @@ public class ShoppingCartController(
 
         if (cart == null)
         {
-            _logger.LogError("No shopping cart with key, so sneding not found.");
             return NotFound("Cart doesn't exist.");
         }
 
         //--Get matching line item.
-        _logger.LogInformation("Current Cart Contents: {cartLineItems}", cart.LineItems);
-        _logger.LogInformation("Looking for line item with the tag id: {tagId}", lineItem.Tag.Id);
         ShoppingCartLineItem? cartLineItem = cart.LineItems
-            .FirstOrDefault(shoppingCartLineItem => shoppingCartLineItem.TagId == lineItem.Tag.Id);
+            .FirstOrDefault(shoppingCartLineItem =>
+                shoppingCartLineItem.ProductId == lineItem.ProductId &&
+                shoppingCartLineItem.TagId == lineItem.Tag.Id);
 
         if (cartLineItem == null)
         {
-            _logger.LogError("No matching line item, so error!");
             return BadRequest("Line item doesn't exist in cart.");
         }
 
@@ -142,10 +138,10 @@ public class ShoppingCartController(
 
     #region "DELETE"
     [HttpDelete("lineitem")]
-    public async Task<IActionResult> DeleteLineItemAsync([FromBody] ShoppingCartLineItemInputDTO lineItem)
+    public async Task<IActionResult> DeleteLineItemAsync([FromBody] int lineItemId)
     {
         await base.DoTestsAsync();
-        
+
         //--Always sending NoContent responses because it doesn't really matter that the line item
         //--or cart doesn't exit. Let the consumer app believe it was deleted so it can continue
         //--its processing.
@@ -159,6 +155,7 @@ public class ShoppingCartController(
         }
 
         ShoppingCart? cart = await _context.ShoppingCarts
+            .Include(cart => cart.LineItems)
             .FirstOrDefaultAsync(shoppingCart => shoppingCart.CartKey == Guid.Parse(cartKey!));
 
         if (cart == null)
@@ -168,7 +165,7 @@ public class ShoppingCartController(
 
         //--Get matching line item.
         ShoppingCartLineItem? cartLineItem = cart.LineItems
-            .FirstOrDefault(shoppingCartLineItem => shoppingCartLineItem.TagId == lineItem.Tag.Id);
+            .FirstOrDefault(shoppingCartLineItem => shoppingCartLineItem.Id == lineItemId);
 
         if (cartLineItem == null)
         {

@@ -16,6 +16,7 @@ public class ShoppingCartLineItemConfiguration : IEntityTypeConfiguration<Shoppi
 
         builder.Property(p => p.ShoppingCartId).IsRequired();
         builder.Property(p => p.Quantity).IsRequired();
+        builder.Property(p => p.ProductId).IsRequired();
         builder.Property(p => p.TagId).IsRequired();
         builder.Property(p => p.SalePriceAtSale).IsRequired();
         builder.Property(p => p.OriginalPriceAtSale).IsRequired();
@@ -25,6 +26,10 @@ public class ShoppingCartLineItemConfiguration : IEntityTypeConfiguration<Shoppi
         builder.HasOne(lineItem => lineItem.ShoppingCart)
             .WithMany(cart => cart.LineItems)
             .HasForeignKey(lineItem => lineItem.ShoppingCartId);
+
+        builder.HasOne(lineItem => lineItem.Product)
+            .WithMany()
+            .HasForeignKey(lineItem => lineItem.ProductId);
 
         builder.HasOne(lineItem => lineItem.Tag)
             .WithMany()

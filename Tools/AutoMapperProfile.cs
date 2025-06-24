@@ -17,7 +17,11 @@ public class AutoMapperProfile : Profile
         CreateMap<ImageType, ImageTypeDTO>();
         CreateMap<ProductImage, ProductImageDTO>();
         CreateMap<Product, ProductDTO>();
+        CreateMap<Product, ShoppingCartProductDTO>();
         CreateMap<ShoppingCart, ShoppingCartDTO>();
-        CreateMap<ShoppingCartLineItem, ShoppingCartLineItemDTO>();
+        CreateMap<ShoppingCartLineItem, ShoppingCartLineItemDTO>()
+            .ForMember(
+                    dest => dest.Product,
+                    opt => opt.MapFrom((src, dest, destMember, context) => context.Mapper.Map<ShoppingCartProductDTO>(src.Product)));
     }
 }

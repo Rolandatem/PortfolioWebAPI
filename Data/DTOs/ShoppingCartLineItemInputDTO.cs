@@ -7,5 +7,6 @@ public record ShoppingCartLineItemInputDTO(
     decimal OriginalPriceAtSale,
     decimal TotalSalePrice,
     decimal TotalOriginalPrice,
+    int ProductId,
     TagDTO Tag
 );

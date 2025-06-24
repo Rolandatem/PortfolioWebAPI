@@ -9,9 +9,11 @@ public class ShoppingCartLineItem
     public decimal TotalSalePrice { get; set; }
     public decimal TotalOriginalPrice { get; set; }
 
-
     public int ShoppingCartId { get; set; }
     public ShoppingCart? ShoppingCart { get; set; }
+
+    public int ProductId { get; set; }
+    public Product? Product { get; set; }
 
     public int TagId { get; set; }
     public Tag? Tag { get; set; }
