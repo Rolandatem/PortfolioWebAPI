@@ -19,6 +19,6 @@ There is no need to download all the contents of the repository to test, just do
 
 With docker installed open a terminal and navigate to the directory that the docker-compose file is located, then run the command: `docker compose up -d`. This will download the images, create docker containers and run them. Using the `-d` command will run them in detached mode freeing your terminal.
 
-Open an internet browser and navigate to `http://localhost:3000/swagger` to view the Swagger UI API Browser.
+Open an internet browser and navigate to `http://localhost:5000/swagger` to view the Swagger UI API Browser.
 
 When done with viewing the demo you can run the command `docker compose down -v` in the terminal. This will shutdown and remove the docker containers as well as delete the data volume used by the database.
