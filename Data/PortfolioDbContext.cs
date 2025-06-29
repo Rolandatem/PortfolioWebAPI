@@ -41,6 +41,7 @@ public class PortfolioDbContext : DbContext
     internal DbSet<ProductImage> ProductImages { get; set; } = null!;
     internal DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
     internal DbSet<ShoppingCartLineItem> ShoppingCartLineItems { get; set; } = null!;
+    internal DbSet<OrderDetail> OrderDetails { get; set; } = null!;
     #endregion
 
     #region "Configuring"

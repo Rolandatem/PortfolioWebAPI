@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,14 @@ public class ShoppingCartController(
             .ProjectTo<ShoppingCartDTO>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
     }
+
+    private async Task<OrderDetailDTO?> GetOrderDetailDTOForKeyAsync(Guid orderKey)
+    {
+        return await _context.OrderDetails
+            .Where(od => od.OrderKey == orderKey)
+            .ProjectTo<OrderDetailDTO>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+    }
     #endregion
 
     #region "GET"
@@ -33,17 +42,57 @@ public class ShoppingCartController(
         string? cartKey = Request.Cookies["cart_key"];
         if (cartKey.IsEmpty())
         {
-            return NotFound("Customer doesn't have a shopping cart.");
+            return Ok(null);
         }
 
         ShoppingCartDTO? cart = await GetShoppingCartDTOForKeyAsync(Guid.Parse(cartKey!));
 
         if (cart == null)
         {
-            return NotFound($"Shopping Cart with key: {cartKey} not found.");
+            return Ok(null);
         }
 
         return Ok(cart);
+    }
+
+    [HttpGet("{cartKey}")]
+    public async Task<ActionResult<ShoppingCartDTO>> GetShoppingCartByKeyAsync(Guid cartKey)
+    {
+        await base.DoTestsAsync();
+
+        ShoppingCartDTO? cart = await GetShoppingCartDTOForKeyAsync(cartKey);
+
+        return Ok(cart);
+    }
+
+    [HttpGet("order")]
+    public async Task<ActionResult<OrderDetailDTO>> GetOrderAsync()
+    {
+        await base.DoTestsAsync();
+
+        string? orderKey = Request.Cookies["order_key"];
+        if (orderKey == null)
+        {
+            return Ok(null);
+        }
+
+        OrderDetailDTO? orderDetail = await GetOrderDetailDTOForKeyAsync(Guid.Parse(orderKey));
+        if (orderDetail == null)
+        {
+            return Ok(null);
+        }
+
+        return Ok(orderDetail);
+    }
+
+    [HttpGet("order/{orderKey}")]
+    public async Task<ActionResult<OrderDetailDTO>> GetOrderByKeyAsync(Guid orderKey)
+    {
+        await base.DoTestsAsync();
+
+        OrderDetailDTO? orderDetail = await GetOrderDetailDTOForKeyAsync(orderKey);
+
+        return Ok(orderDetail);
     }
     #endregion
 
@@ -79,6 +128,7 @@ public class ShoppingCartController(
             OriginalPriceAtSale = lineItem.OriginalPriceAtSale,
             TotalSalePrice = lineItem.TotalSalePrice,
             TotalOriginalPrice = lineItem.TotalOriginalPrice,
+            SavingsPercentageAtSale = lineItem.SavingsPercentageAtSale,
             TagId = lineItem.Tag.Id
         });
 
@@ -86,6 +136,65 @@ public class ShoppingCartController(
 
         ShoppingCartDTO? cartDTO = await GetShoppingCartDTOForKeyAsync(cart.CartKey);
         return CreatedAtAction("GetShoppingCart", new { cartKey = cart.CartKey }, cartDTO);
+    }
+
+    [HttpPost("order")]
+    public async Task<ActionResult<OrderDetailDTO>> CreateOrderAsync([FromBody] OrderDetailInputDTO orderDetail)
+    {
+        await base.DoTestsAsync();
+
+        //--Get cart
+        string? cartKey = Request.Cookies["cart_key"];
+        if (cartKey.IsEmpty())
+        {
+            return BadRequest("Customer doesn't have a cart.");
+        }
+
+        ShoppingCart? cart = await _context.ShoppingCarts
+            .Where(cart => cart.CartKey == Guid.Parse(cartKey!))
+            .FirstOrDefaultAsync();
+
+        if (cart == null)
+        {
+            return NotFound("Cart doesn't exist.");
+        }
+
+        cart.OrderDetail = new OrderDetail()
+        {
+            OrderKey = Guid.NewGuid(),
+            ShoppingCartId = cart.Id,
+
+            ShippingEmail = orderDetail.ShippingEmail,
+            ShippingFirstName = orderDetail.ShippingFirstName,
+            ShippingLastName = orderDetail.ShippingLastName,
+            ShippingAddress = orderDetail.ShippingAddress,
+            ShippingSuiteApt = orderDetail.ShippingSuiteApt,
+            ShippingCity = orderDetail.ShippingCity,
+            ShippingState = orderDetail.ShippingState,
+            ShippingZipCode = orderDetail.ShippingZipCode,
+            ShippingPhone = Regex.Replace(orderDetail.ShippingPhone, @"\D", ""),
+
+            BillingEmail = orderDetail.BillingEmail,
+            BillingFirstName = orderDetail.BillingFirstName,
+            BillingLastName = orderDetail.BillingLastName,
+            BillingAddress = orderDetail.BillingAddress,
+            BillingSuiteApt = orderDetail.BillingSuiteApt,
+            BillingCity = orderDetail.BillingCity,
+            BillingState = orderDetail.BillingState,
+            BillingZipCode = orderDetail.BillingZipCode,
+            BillingPhone = Regex.Replace(orderDetail.BillingPhone, @"\D", ""),
+
+            CardNumber = $"**** **** **** {orderDetail.CardNumber[^4..]}",
+            NameOnCard = orderDetail.NameOnCard,
+            ExpirationDate = orderDetail.ExpirationDate,
+            CVV = orderDetail.CVV
+        };
+        cart.IsComplete = true;
+
+        await _context.SaveChangesAsync();
+        
+        OrderDetailDTO? orderDetailDTO = await GetOrderDetailDTOForKeyAsync(cart.OrderDetail.OrderKey);
+        return CreatedAtAction("GetOrder", new { orderKey = cart.OrderDetail.OrderKey }, orderDetailDTO);
     }
     #endregion
 
@@ -129,6 +238,7 @@ public class ShoppingCartController(
         cartLineItem.OriginalPriceAtSale = lineItem.OriginalPriceAtSale;
         cartLineItem.TotalSalePrice = lineItem.TotalSalePrice;
         cartLineItem.TotalOriginalPrice = lineItem.TotalOriginalPrice;
+        cartLineItem.SavingsPercentageAtSale = lineItem.SavingsPercentageAtSale;
         await _context.SaveChangesAsync();
 
         ShoppingCartDTO? cartDTO = await GetShoppingCartDTOForKeyAsync(cart.CartKey);

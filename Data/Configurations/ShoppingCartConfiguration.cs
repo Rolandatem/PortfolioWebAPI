@@ -13,6 +13,7 @@ public class ShoppingCartConfiguration : IEntityTypeConfiguration<ShoppingCart>
         builder.HasKey(k => k.Id);
 
         builder.Property(p => p.CartKey).IsRequired();
+        builder.Property(p => p.IsComplete).IsRequired();
 
         builder.HasMany(cart => cart.LineItems)
             .WithOne(lineItems => lineItems.ShoppingCart)

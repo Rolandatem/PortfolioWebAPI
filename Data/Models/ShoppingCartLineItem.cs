@@ -8,6 +8,7 @@ public class ShoppingCartLineItem
     public decimal OriginalPriceAtSale { get; set; }
     public decimal TotalSalePrice { get; set; }
     public decimal TotalOriginalPrice { get; set; }
+    public int SavingsPercentageAtSale { get; set; }
 
     public int ShoppingCartId { get; set; }
     public ShoppingCart? ShoppingCart { get; set; }

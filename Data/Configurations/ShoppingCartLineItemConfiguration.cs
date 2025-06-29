@@ -22,6 +22,7 @@ public class ShoppingCartLineItemConfiguration : IEntityTypeConfiguration<Shoppi
         builder.Property(p => p.OriginalPriceAtSale).IsRequired();
         builder.Property(p => p.TotalSalePrice).IsRequired();
         builder.Property(p => p.TotalOriginalPrice).IsRequired();
+        builder.Property(p => p.SavingsPercentageAtSale).IsRequired();
 
         builder.HasOne(lineItem => lineItem.ShoppingCart)
             .WithMany(cart => cart.LineItems)

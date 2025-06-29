@@ -17,11 +17,26 @@ public class AutoMapperProfile : Profile
         CreateMap<ImageType, ImageTypeDTO>();
         CreateMap<ProductImage, ProductImageDTO>();
         CreateMap<Product, ProductDTO>();
-        CreateMap<Product, ShoppingCartProductDTO>();
+        CreateMap<Product, ShoppingCartProductDTO>()
+            .ForCtorParam(
+                "ShipType",
+                opt => opt.MapFrom(src => src.ProductTags
+                        .Where(pt =>
+                            pt.Tag != null &&
+                            pt.Tag.TagType != null &&
+                            pt.Tag.TagType.Name == "Ship Type")
+                        .Select(pt => pt.Tag!.Name)
+                        .FirstOrDefault()));
         CreateMap<ShoppingCart, ShoppingCartDTO>();
         CreateMap<ShoppingCartLineItem, ShoppingCartLineItemDTO>()
             .ForMember(
                     dest => dest.Product,
                     opt => opt.MapFrom((src, dest, destMember, context) => context.Mapper.Map<ShoppingCartProductDTO>(src.Product)));
+
+        CreateMap<OrderDetail, OrderDetailDTO>()
+            .ForCtorParam(
+                "IsComplete",
+                opt => opt.MapFrom(src => src.ShoppingCart!.IsComplete)
+            );
     }
 }
