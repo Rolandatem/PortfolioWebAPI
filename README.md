@@ -6,6 +6,14 @@ This .NET Core Web API is a support tool for some of my other Portfolio applicat
 
 This is meant to run in a docker container and the image has is publised as `estebanfmartinez/portfolio-webapi:latest` on Docker Hub. However this can be run straight out of Visual Studio/Code but is dependant on the existance of the database below.
 
+## Demo Features
+This demo features my use of the following technologies/frameworks:
+- .NET Core C#
+- Entity Framework Core
+- PostgreSQL Database
+- Automapper
+- REST API
+
 ## Requirements
 The data repository for this Web API is a PostgreSQL database and is maintained using the image `estebanfmartinez/portfolio-postgre:latest` on Docker Hub. There is currently no stand-alone version in my GitHub repository. It's preferred to use the image anyway because it includes seeding scripts.
 
