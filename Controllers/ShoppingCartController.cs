@@ -24,39 +24,20 @@ public class ShoppingCartController(
             .FirstOrDefaultAsync();
     }
 
-    private async Task<OrderDetailDTO?> GetOrderDetailDTOForKeyAsync(Guid orderKey)
+    private async Task<OrderDetailDTO?> GetOrderDetailDTOForKeyAsync(Guid cartKey)
     {
         return await _context.OrderDetails
-            .Where(od => od.OrderKey == orderKey)
+            .Where(od =>
+                od.ShoppingCart != null &&
+                od.ShoppingCart.CartKey == cartKey)
             .ProjectTo<OrderDetailDTO>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
     }
     #endregion
 
     #region "GET"
-    [HttpGet]
-    public async Task<ActionResult<ShoppingCartDTO>> GetShoppingCartAsync()
-    {
-        await base.DoTestsAsync();
-
-        string? cartKey = Request.Cookies["cart_key"];
-        if (cartKey.IsEmpty())
-        {
-            return Ok(null);
-        }
-
-        ShoppingCartDTO? cart = await GetShoppingCartDTOForKeyAsync(Guid.Parse(cartKey!));
-
-        if (cart == null)
-        {
-            return Ok(null);
-        }
-
-        return Ok(cart);
-    }
-
     [HttpGet("{cartKey}")]
-    public async Task<ActionResult<ShoppingCartDTO>> GetShoppingCartByKeyAsync(Guid cartKey)
+    public async Task<ActionResult<ShoppingCartDTO>> GetShoppingCartAsync(Guid cartKey)
     {
         await base.DoTestsAsync();
 
@@ -65,32 +46,12 @@ public class ShoppingCartController(
         return Ok(cart);
     }
 
-    [HttpGet("order")]
-    public async Task<ActionResult<OrderDetailDTO>> GetOrderAsync()
+    [HttpGet("{cartKey}/order")]
+    public async Task<ActionResult<OrderDetailDTO>> GetOrderAsync(Guid cartKey)
     {
         await base.DoTestsAsync();
 
-        string? orderKey = Request.Cookies["order_key"];
-        if (orderKey == null)
-        {
-            return Ok(null);
-        }
-
-        OrderDetailDTO? orderDetail = await GetOrderDetailDTOForKeyAsync(Guid.Parse(orderKey));
-        if (orderDetail == null)
-        {
-            return Ok(null);
-        }
-
-        return Ok(orderDetail);
-    }
-
-    [HttpGet("order/{orderKey}")]
-    public async Task<ActionResult<OrderDetailDTO>> GetOrderByKeyAsync(Guid orderKey)
-    {
-        await base.DoTestsAsync();
-
-        OrderDetailDTO? orderDetail = await GetOrderDetailDTOForKeyAsync(orderKey);
+        OrderDetailDTO? orderDetail = await GetOrderDetailDTOForKeyAsync(cartKey);
 
         return Ok(orderDetail);
     }
@@ -98,25 +59,34 @@ public class ShoppingCartController(
 
     #region "POST"
     [HttpPost]
-    public async Task<ActionResult<ShoppingCartDTO>> AddItemToCartAsync([FromBody] ShoppingCartLineItemInputDTO lineItem)
+    public async Task<ActionResult<string>> CreateCartAsync()
     {
         await base.DoTestsAsync();
 
-        string? cartKey = Request.Cookies["cart_key"];
+        ShoppingCart newCart = new ShoppingCart()
+        {
+            CartKey = Guid.NewGuid()
+        };
+
+        _context.ShoppingCarts.Add(newCart);
+        await _context.SaveChangesAsync();
+
+        //--Uses 200 status code like Ok.
+        return Content(newCart.CartKey.ToString(), "text/plain");
+    }
+
+    [HttpPost("{cartKey}/lineitem")]
+    public async Task<ActionResult<ShoppingCartDTO>> AddItemToCartAsync([FromBody] ShoppingCartLineItemInputDTO lineItem, Guid cartKey)
+    {
+        await base.DoTestsAsync();
 
         //--First get existing cart, or create new.
-        ShoppingCart? cart = cartKey.Exists()
-            ? await _context.ShoppingCarts
-                .FirstOrDefaultAsync(cart => cart.CartKey == Guid.Parse(cartKey!))
-            : null;
+        ShoppingCart? cart = await _context.ShoppingCarts
+                .FirstOrDefaultAsync(cart => cart.CartKey == cartKey);
 
         if (cart == null)
         {
-            cart = new ShoppingCart()
-            {
-                CartKey = Guid.NewGuid()
-            };
-            _context.ShoppingCarts.Add(cart);
+            return BadRequest("Cart does not exist.");
         }
 
         //--Add line item to cart.
@@ -138,20 +108,13 @@ public class ShoppingCartController(
         return CreatedAtAction("GetShoppingCart", new { cartKey = cart.CartKey }, cartDTO);
     }
 
-    [HttpPost("order")]
-    public async Task<ActionResult<OrderDetailDTO>> CreateOrderAsync([FromBody] OrderDetailInputDTO orderDetail)
+    [HttpPost("{cartKey}/order")]
+    public async Task<ActionResult<OrderDetailDTO>> CreateOrderAsync([FromBody] OrderDetailInputDTO orderDetail, Guid cartKey)
     {
         await base.DoTestsAsync();
 
-        //--Get cart
-        string? cartKey = Request.Cookies["cart_key"];
-        if (cartKey.IsEmpty())
-        {
-            return BadRequest("Customer doesn't have a cart.");
-        }
-
         ShoppingCart? cart = await _context.ShoppingCarts
-            .Where(cart => cart.CartKey == Guid.Parse(cartKey!))
+            .Where(cart => cart.CartKey == cartKey)
             .FirstOrDefaultAsync();
 
         if (cart == null)
@@ -193,29 +156,21 @@ public class ShoppingCartController(
 
         await _context.SaveChangesAsync();
         
-        OrderDetailDTO? orderDetailDTO = await GetOrderDetailDTOForKeyAsync(cart.OrderDetail.OrderKey);
-        return CreatedAtAction("GetOrder", new { orderKey = cart.OrderDetail.OrderKey }, orderDetailDTO);
+        OrderDetailDTO? orderDetailDTO = await GetOrderDetailDTOForKeyAsync(cart.CartKey);
+        return CreatedAtAction("GetOrder", new { cartKey = cart.CartKey }, orderDetailDTO);
     }
     #endregion
 
     #region "PATCH"
-    [HttpPatch("lineitem")]
-    public async Task<ActionResult<ShoppingCartDTO>> UpdateLineItemAsync([FromBody] ShoppingCartLineItemInputDTO lineItem)
+    [HttpPatch("{cartKey}/lineitem")]
+    public async Task<ActionResult<ShoppingCartDTO>> UpdateLineItemAsync([FromBody] ShoppingCartLineItemInputDTO lineItem, Guid cartKey)
     {
         await base.DoTestsAsync();
-
-        //--Get cart
-        string? cartKey = Request.Cookies["cart_key"];
-
-        if (cartKey.IsEmpty())
-        {
-            return BadRequest("Customer doesn't have a cart.");
-        }
 
         ShoppingCart? cart = await _context.ShoppingCarts
             .Include(shoppingCart => shoppingCart.LineItems)
                 .ThenInclude(shoppingCartLineItem => shoppingCartLineItem.Tag)
-            .FirstOrDefaultAsync(shoppingCart => shoppingCart.CartKey == Guid.Parse(cartKey!));
+            .FirstOrDefaultAsync(shoppingCart => shoppingCart.CartKey == cartKey);
 
         if (cart == null)
         {
@@ -247,8 +202,8 @@ public class ShoppingCartController(
     #endregion
 
     #region "DELETE"
-    [HttpDelete("lineitem")]
-    public async Task<IActionResult> DeleteLineItemAsync([FromBody] int lineItemId)
+    [HttpDelete("{cartKey}/lineitem")]
+    public async Task<IActionResult> DeleteLineItemAsync([FromBody] int lineItemId, Guid cartKey)
     {
         await base.DoTestsAsync();
 
@@ -256,17 +211,9 @@ public class ShoppingCartController(
         //--or cart doesn't exit. Let the consumer app believe it was deleted so it can continue
         //--its processing.
 
-        //--Get cart
-        string? cartKey = Request.Cookies["cart_key"];
-
-        if (cartKey.IsEmpty())
-        {
-            return NoContent();
-        }
-
         ShoppingCart? cart = await _context.ShoppingCarts
             .Include(cart => cart.LineItems)
-            .FirstOrDefaultAsync(shoppingCart => shoppingCart.CartKey == Guid.Parse(cartKey!));
+            .FirstOrDefaultAsync(shoppingCart => shoppingCart.CartKey == cartKey);
 
         if (cart == null)
         {

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using PortfolioWebAPI;
 using PortfolioWebAPI.Data;
 using PortfolioWebAPI.Middleware;
 using PortfolioWebAPI.Settings;
@@ -35,14 +34,14 @@ builder.Services.AddControllers(options =>
 var app = builder.Build();
 
 //--Configure Application
-if (app.Environment.IsDevelopment() || app.Environment.IsDockerSolo() || app.Environment.IsDockerCompose())
-{
+// if (app.Environment.IsDevelopment() || app.Environment.IsDockerSolo() || app.Environment.IsDockerCompose())
+// {
     app.MapOpenApi();
     app.UseSwaggerUi(options =>
     {
         options.DocumentPath = "/openapi/v1.json";
     });
-}
+// }
 //app.UseHttpsRedirection();
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseAuthorization();
@@ -53,8 +52,7 @@ IOptions<SiteSettingOptions> siteSettings = app.Services.GetRequiredService<IOpt
 app.UseCors(cors => cors
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .WithOrigins(siteSettings.Value.AllowedOrigins)
-    .AllowCredentials());
+    .AllowAnyOrigin());
 
 //--App Start!
 app.Run();
