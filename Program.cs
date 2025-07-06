@@ -1,8 +1,9 @@
-using Microsoft.Extensions.Options;
+using PortfolioWebAPI;
 using PortfolioWebAPI.Data;
 using PortfolioWebAPI.Middleware;
 using PortfolioWebAPI.Settings;
 using PortfolioWebAPI.Tools;
+using Scalar.AspNetCore;
 
 //--Create App Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 //--System Services
 builder.Services.AddControllers();
 builder.Services
+    .AddMemoryCache()
     .AddOpenApi()
     .AddAutoMapper(typeof(AutoMapperProfile));
 
@@ -34,25 +36,26 @@ builder.Services.AddControllers(options =>
 var app = builder.Build();
 
 //--Configure Application
-// if (app.Environment.IsDevelopment() || app.Environment.IsDockerSolo() || app.Environment.IsDockerCompose())
-// {
-    app.MapOpenApi();
-    app.UseSwaggerUi(options =>
-    {
-        options.DocumentPath = "/openapi/v1.json";
-    });
-// }
-//app.UseHttpsRedirection();
-app.UseMiddleware<UnhandledExceptionMiddleware>();
-app.UseAuthorization();
-app.MapControllers();
-
-IOptions<SiteSettingOptions> siteSettings = app.Services.GetRequiredService<IOptions<SiteSettingOptions>>();
-
+app.UseRouting();
 app.UseCors(cors => cors
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowAnyOrigin());
+app.UseMiddleware<UnhandledExceptionMiddleware>();
+app.UseMiddleware<RateLimiterMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
+if (app.Environment.IsProduction() || app.Environment.IsGoogleCloudRun())
+{
+    app.UseHttpsRedirection();
+}
+else if (app.Environment.IsDevelopment() || app.Environment.IsDockerCompose())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+app.UseAuthorization();
+app.MapControllers();
+
 
 //--App Start!
 app.Run();

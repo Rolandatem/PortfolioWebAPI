@@ -202,8 +202,8 @@ public class ShoppingCartController(
     #endregion
 
     #region "DELETE"
-    [HttpDelete("{cartKey}/lineitem")]
-    public async Task<IActionResult> DeleteLineItemAsync([FromBody] int lineItemId, Guid cartKey)
+    [HttpDelete("{cartKey}/lineitem/{lineItemId}")]
+    public async Task<IActionResult> DeleteLineItemAsync(Guid cartKey, int lineItemId)
     {
         await base.DoTestsAsync();
 

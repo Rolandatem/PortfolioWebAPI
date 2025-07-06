@@ -49,14 +49,14 @@ public class PortfolioDbContext : DbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        _logger?.LogInformation("DB SERVER: {server}", _siteSettings?.PortfolioDbServer);
+        _logger?.LogInformation("DB SERVER: {server}", _siteSettings?.DatabaseConnection);
 
         // optionsBuilder
         //     .UseInMemoryDatabase("Portfolio");
         // optionsBuilder
         //     .UseSqlServer($"Server={_siteSettings?.PortfolioDbServer},1433;Database=PortfolioDB;User Id=sa;Password=SomePassword#1;TrustServerCertificate=True");
         optionsBuilder
-            .UseNpgsql($"Host={_siteSettings?.PortfolioDbServer};Port=5432;Database=portfoliodb;Username=sa;Password=SomePassword#1", options =>
+            .UseNpgsql(_siteSettings?.DatabaseConnection, options =>
             {
                 //--This helps in performance when an object with multiple
                 //--navigation properties are requested.

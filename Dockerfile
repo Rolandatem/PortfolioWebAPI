@@ -16,8 +16,7 @@ COPY --from=build /app/publish ./
 #     mkdir -p /remote_debugger && \
 #     curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /remote_debugger
 
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_ENVIRONMENT=DockerSolo
-EXPOSE 5000
+#ENV ASPNETCORE_URLS=http://+:$PORT
+#EXPOSE 5000
 
 ENTRYPOINT ["dotnet", "PortfolioWebAPI.dll"]

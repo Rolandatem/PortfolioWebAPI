@@ -15,4 +15,11 @@ public static class HostEnvironmentExtensionMethods
 
         return hostEnvironment.IsEnvironment("DockerCompose");
     }
+
+    public static bool IsGoogleCloudRun(this IHostEnvironment hostEnvironment)
+    {
+        ArgumentNullException.ThrowIfNull(hostEnvironment);
+
+        return hostEnvironment.IsEnvironment("GoogleRun");
+    }
 }

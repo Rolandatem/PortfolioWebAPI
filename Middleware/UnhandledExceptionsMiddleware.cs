@@ -30,6 +30,12 @@ internal class UnhandledExceptionMiddleware(
         HttpContext httpContext,
         Exception ex)
     {
+        //--Dont interfere if a response already started.
+        if (httpContext.Response.HasStarted)
+        {
+            return Task.CompletedTask;
+        }
+
         httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         var response = new

@@ -17,6 +17,7 @@ services:
     image: estebanfmartinez/portfolio-webapi:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=DockerCompose
+      - ASPNETCORE_URLS=http://+:5000
     depends_on:
       - postgre
     ports:
