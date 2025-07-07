@@ -13,6 +13,7 @@ This demo features my use of the following technologies/frameworks:
 - PostgreSQL Database
 - Automapper
 - REST API
+- Google Cloud SQL (In live sites)
 
 ## Requirements
 The data repository for this Web API is a PostgreSQL database and is maintained using the image `estebanfmartinez/portfolio-postgre:latest` on Docker Hub. There is currently no stand-alone version in my GitHub repository. It's preferred to use the image anyway because it includes seeding scripts.
